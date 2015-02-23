@@ -23,10 +23,10 @@ function init_grievance_settings() { // whitelist options
 	register_setting( 'grievance-settings-group', 'grievance_user_id' );
 	register_setting( 'grievance-settings-group', 'grievance_password' );
 	register_setting( 'grievance-settings-group', 'grievance_group_id' );
-	add_settings_section('grievance_main', 'Main Settings', 'plugin_section_text', 'grievance');
-	add_settings_field('g_user_id', 'Grievancego.com Username: ', 'grievance_input_user_id', 'grievance', 'grievance_main');
-	add_settings_field('g_password', 'Grievancego.com Password: ', 'grievance_input_password', 'grievance', 'grievance_main');
-	add_settings_field('g_group_id', 'Grievancego.com Group ID: ', 'grievance_input_group_id', 'grievance', 'grievance_main');
+	add_settings_section('grievance_main', 'Settings at www.grievancego.com', 'plugin_section_text', 'grievance');
+	add_settings_field('g_user_id', 'Username: ', 'grievance_input_user_id', 'grievance', 'grievance_main');
+	add_settings_field('g_password', 'Password: ', 'grievance_input_password', 'grievance', 'grievance_main');
+	add_settings_field('g_group_id', 'Group ID: ', 'grievance_input_group_id', 'grievance', 'grievance_main');
 }
 
 function get_input_text($option) {
