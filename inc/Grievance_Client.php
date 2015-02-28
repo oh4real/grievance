@@ -11,11 +11,10 @@ class Grievance_Client {
 	private $userId;
 	private $password;
 	private $groupId;
+	private $firstName;
+	private $lastName;
 
-	public function __construct($userId, $password, $groupId) {
-		$this->userId = $userId;
-		$this->password = $password;
-		$this->groupId = $groupId;
+	public function __construct() {
 		$this->jsessionId = Curl_Lib::get_web_page(self::LOGON_PATH)->getCookies();
 	}
 
@@ -32,10 +31,11 @@ class Grievance_Client {
 	public function findall_asform() {
 		$findAllParams = array(
 		    "dispatch" => "find",
-		    "groupId" => $this->groupId
+		    "groupId" => $this->groupId,
+		    "employeeFullName" => sprintf("fname:%s lname:%s", $this->firstName, $this->lastName)
 		);
 		preg_match('/<form (.*)<\/form>/s', Curl_Lib::post_web_page(self::FIND_PATH, $findAllParams, $this->jsessionId)->getContent(), $matches);
-		return str_replace("\r\n", " ", $matches[0]);
+		return str_replace("  ", " ", preg_replace('/\s+/S', " ", $matches[0]));
 	}
 
 	public function process_table($form) {
@@ -53,5 +53,31 @@ class Grievance_Client {
 			}
 		}
 		return $html;
+	}
+
+	public function setUserId($val) {
+		$this->userId = $val;
+	}
+
+	public function setPassword($val) {
+		$this->password = $val;
+	}
+
+	public function setGroupId($val) {
+		$this->groupId = $val;
+	}
+
+	public function setWpUser(WP_User $user) {
+		// magic Getters
+		$this->firstName = $user->first_name;
+		$this->lastName = $user->last_name;}
+
+	public function toArray() {
+		return array(
+			'jsessionId' => $this->jsessionId,
+			'userId' => 	$this->userId,
+			'password' => 	$this->password,
+			'groupId' => 	$this->groupId,
+			);
 	}
 }

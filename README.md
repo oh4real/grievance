@@ -15,7 +15,7 @@
 		            'action':'grievance_ajax_request'
 		        }, 
 		        beforeSend:function() {
-		            $("#includedContent").html("<img src='/wp-content/plugins/grievance/images/ajax-loader.gif' class='grievance-loader'>");
+		            $("#includedContent").html("<img src='/wp-content/plugins/grievance/media/images/ajax-loader.gif' class='grievance-loader'>");
 		        },
 		        success:function(data) {
 		            // This outputs the result of the ajax request

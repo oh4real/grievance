@@ -9,17 +9,20 @@
  * Network: false
  * License: GPL2
  */
-error_reporting(E_ERROR | E_PARSE);
 
 require_once('inc/Grievance_Client.php');
-require_once('inc/functions.php');
+require_once('inc/Grievance_Plugin.php');
+$gr = new Grievance_Plugin();
 
 if ( is_admin() ){ // admin actions
-	add_action( 'admin_menu', 'add_grievance_menu' );
-	add_action( 'admin_init', 'init_grievance_settings' );
+	add_action( 'admin_menu', array($gr, 'add_plugin_menu'));
+	add_action( 'admin_init', array($gr, 'init_plugin_settings' ));
 } else {
-	add_action('wp_head','grievance_ajaxurl');
+	add_action('wp_head', array($gr, 'plugin_ajaxurl'));
 }
-add_action( 'wp_ajax_grievance_ajax_request', 'grievance_ajax_request' );
-add_action( 'wp_ajax_nopriv_grievance_ajax_request', 'grievance_ajax_request' );
+
+add_action( 'wp_ajax_grievance_ajax_request', array($gr, 'plugin_ajax_request' ));
+add_action( 'wp_ajax_nopriv_grievance_ajax_request', array($gr, 'plugin_ajax_request' ));
+add_action( 'wp_ajax_grievance_ajax_form_request', array($gr, 'plugin_ajax_form_request' ));
+add_action( 'wp_ajax_nopriv_grievance_ajax_form_request', array($gr, 'plugin_ajax_form_request' ));
 
