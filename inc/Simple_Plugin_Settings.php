@@ -1,16 +1,9 @@
 <?php
 
-abstract class Simple_Plugin_Options {
-	protected $pluginNamespace = 'TBD';
-	protected $pluginSettingsTitle = 'TBD Settings';
-
-	public function plugin_ajaxurl() {
-		echo sprintf("<script type='text/javascript'>if (typeof ajaxurl === 'undefined') var ajaxurl = '%s';</script>", admin_url('admin-ajax.php'));
-	}
-
-	public function plugin_ajax_request() {
-		throw new Exception(sprintf('Must define %::%',  __CLASS__, __METHOD__));
-	}
+abstract class Simple_Plugin_Settings {
+	const PLUGIN_NAMESPACE = 'plugin';
+	const PLUGIN_SETTINGS_TITLE = 'plugin Settings';
+	const PLUGIN_SECTION = 'plugin_main';
 
 	public function init_plugin_settings() {
 		throw new Exception(sprintf('Must define %::%',  __CLASS__, __METHOD__));
@@ -35,11 +28,20 @@ HTML;
 
 	public function generate_select_field($args) {
 		$option = $args['field'];
-		$type = array_key_exists('type', $args) ? $args['type'] : 'text';
-		$input = <<<HTML
-			<input type="%s" name="%s" id="%s" value="%s" />
+		$options = $args['options'];
+		$select = <<<HTML
+			<select name="%s" id="%s">
+				%s
+			</select>
 HTML;
-		echo sprintf($input, $type, $option, $option, get_option($option));
+		$optionTemplate = <<<HTML
+			<option value="%s" %s>%s</option>
+HTML;
+		$selectOptions = sprintf($option, '', !get_option($option) ? 'selected' : '', 'Select One'); // make this default select one?
+		foreach ($options as $value => $label) {
+			$selectOptions .= sprintf($option, $value, get_option($option) == $value ? 'selected' : '', $label);
+		}
+		echo sprintf($input, $option, $option, $selectOptions);
 	}
 
 	public function generate_radio_field($args) {
@@ -68,13 +70,17 @@ HTML;
 	        </div>
 HTML;
 		ob_start();
-			settings_fields( $this->pluginNamespace . '-settings-group' );
-			do_settings_sections( $this->pluginNamespace );
+			settings_fields( static::PLUGIN_NAMESPACE . '-settings-group' );
+			do_settings_sections( static::PLUGIN_NAMESPACE );
 			submit_button(); 
 		$fields = ob_get_contents();
 		ob_end_clean();
 
-		echo sprintf($str, $this->pluginSettingsTitle, $fields);
+		echo sprintf($str, static::PLUGIN_SETTINGS_TITLE, $fields);
 	}	
+
+	public function plugin_ajaxurl() {
+		echo sprintf("<script type='text/javascript'>if (typeof ajaxurl === 'undefined') var ajaxurl = '%s';</script>", admin_url('admin-ajax.php'));
+	}
 
 }

@@ -28,19 +28,20 @@ class Grievance_Client {
 		return;
 	}
 
-	public function findall_asform() {
+	public function fetchSearchResults() {
 		$findAllParams = array(
 		    "dispatch" => "find",
 		    "groupId" => $this->groupId,
 		    "employeeFullName" => sprintf("fname:%s lname:%s", $this->firstName, $this->lastName)
 		);
+
 		preg_match('/<form (.*)<\/form>/s', Curl_Lib::post_web_page(self::FIND_PATH, $findAllParams, $this->jsessionId)->getContent(), $matches);
-		return str_replace("  ", " ", preg_replace('/\s+/S', " ", $matches[0]));
+		return str_replace('&nbsp;', '', preg_replace('/\s+/S', " ", $matches[0]));
 	}
 
-	public function process_table($form) {
+	public function extractHtmlTable($xml) {
 		$dom = new DOMDocument;
-		$dom->loadHTML($form);
+		$dom->loadHTML($xml);
 		$tables = $dom->getElementsByTagName('table');
 
 		$html;
@@ -49,10 +50,39 @@ class Grievance_Client {
 				$html = str_replace('href="../', 'href="https://www.grievancego.com/', $table->C14N());
 				$html = str_replace('images/pdf_image.jpg', 'http://www.adobe.com/images/pdficon_large.png', $html);
 				$html = str_replace('href="Grievance', 'href="https://www.grievancego.com/Grievance', $html);
+				$html = str_replace('GrievancePath.do?dispatch', 'GrievanceWeb/GrievancePath.do?dispatch', $html);
 				$html = str_replace('>Re-Open</a>', ' target="_blank">Re-Open</a>', $html);
 			}
 		}
 		return $html;
+	}
+
+	public function convertTableToArray($xml) {
+		$simpleXml = simplexml_load_string($xml);
+		$tables = $simpleXml->children()->children()->children();
+		$fieldNameElements = $tables->xpath("//tr[@bgcolor='lightblue']");
+		$keys = array();
+		foreach ($fieldNameElements[0]->children() as $th) {
+			$keys[] = preg_replace('/\W+/S', '', trim((string)$th));
+		}
+
+		$rows = $tables->xpath("//table[@class='results']/tbody/tr[not(@bgcolor)]");
+		$json = array();
+		for ($i=1; $i<count($rows); $i += 3) {
+			$record = array();
+			$data = array_combine($keys, $rows[$i-1]->xpath('td'));
+			foreach($data as $key => $val) {
+				if ($val->count()) {
+					// @todo: do some iterations
+				} else {
+					$record[$key] = (string) $val;
+				}
+			}
+			$summary = $rows[$i]->xpath('td');
+			$record['Summary'] = (string)$summary[0];
+			$json[] = $record;
+		}
+		return $json;
 	}
 
 	public function setUserId($val) {

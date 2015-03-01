@@ -10,15 +10,16 @@
  * License: GPL2
  */
 
-require_once('inc/Grievance_Client.php');
+require_once('inc/Grievance_Settings.php');
 require_once('inc/Grievance_Plugin.php');
 $gr = new Grievance_Plugin();
+$gs = new Grievance_Settings();
 
 if ( is_admin() ){ // admin actions
-	add_action( 'admin_menu', array($gr, 'add_plugin_menu'));
-	add_action( 'admin_init', array($gr, 'init_plugin_settings' ));
+	add_action( 'admin_menu', array($gs, 'add_plugin_menu'));
+	add_action( 'admin_init', array($gs, 'init_plugin_settings' ));
 } else {
-	add_action('wp_head', array($gr, 'plugin_ajaxurl'));
+	add_action('wp_head', array($gs, 'plugin_ajaxurl'));
 }
 
 add_action( 'wp_ajax_grievance_ajax_request', array($gr, 'plugin_ajax_request' ));
