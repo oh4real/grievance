@@ -19,7 +19,7 @@ class Grievance_Client {
 
 	public function __construct() {
 		$this->request = new Curl_Request(Curl_Request::HTTPS_PROTOCOL, self::GRIEVANCE_HOST);
-		$this->jsessionId = Curl_Lib::get_web_page($this->request->setRoute(self::LOGON_PATH))->getCookies();
+		$this->jsessionId = Curl_Lib::get($this->request->setRoute(self::LOGON_PATH))->getCookies();
 	}
 
 	public function login() {
@@ -30,7 +30,7 @@ class Grievance_Client {
 			);
 		$request = clone $this->request;
 		$request->setRoute(self::LOGON_PATH . ";" . $this->jsessionId);
-		$response = Curl_Lib::post_web_page($request, $fields, $this->jsessionId);
+		$response = Curl_Lib::post($request, $fields, $this->jsessionId);
 		$dom = new DOMDocument;
 		$dom->loadHTML($response->getContent());
 		$simpleXml = simplexml_load_string($dom->C14N());
@@ -42,7 +42,7 @@ class Grievance_Client {
 		$request = clone $this->request;
 		$request->setRoute(self::FIND_PATH . '?dispatch=init')
 			->setReferer(sprintf('%s/%s', $request->getHost(), self::FIND_PATH ));
-		$content = Curl_Lib::get_web_page($request, $this->jsessionId)->getContent();
+		$content = Curl_Lib::get($request, $this->jsessionId)->getContent();
 		preg_match('/<form (.*)<\/form>/s', $content, $matches);
 		return str_replace('&nbsp;', '', preg_replace('/\s+/S', " ", $matches[0]));
 	}
@@ -57,7 +57,21 @@ class Grievance_Client {
 		$request = clone $this->request;
 		$request->setRoute(self::FIND_PATH)
 			->setReferer(sprintf('%s/%s', $request->getHost(), self::FIND_PATH . '?dispatch=init'));
-		$content = Curl_Lib::post_web_page($request, $findAllParams, $this->jsessionId)->getContent();
+		$content = Curl_Lib::post($request, $findAllParams, $this->jsessionId)->getContent();
+		preg_match('/<form (.*)<\/form>/s', $content, $matches);
+		return str_replace('&nbsp;', '', preg_replace('/\s+/S', " ", $matches[0]));
+	}
+
+	public function fetchAllSearchResults() {
+		$findAllParams = array(
+		    "dispatch" => "find",
+		    "groupId" => $this->groupId,
+		    "sortOption" => "G"
+		);
+		$request = clone $this->request;
+		$request->setRoute(self::FIND_PATH)
+			->setReferer(sprintf('%s/%s', $request->getHost(), self::FIND_PATH . '?dispatch=init'));
+		$content = Curl_Lib::post($request, $findAllParams, $this->jsessionId)->getContent();
 		preg_match('/<form (.*)<\/form>/s', $content, $matches);
 		return str_replace('&nbsp;', '', preg_replace('/\s+/S', " ", $matches[0]));
 	}

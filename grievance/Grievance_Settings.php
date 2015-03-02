@@ -16,12 +16,16 @@ class Grievance_Settings extends Simple_Plugin_Settings {
 
 	public function init_plugin_settings() { // whitelist options
 		// register your site-level options
+		register_setting( 'grievance-settings-group', self::USER_ID );
+		register_setting( 'grievance-settings-group', self::PASSWORD );
 		register_setting( 'grievance-settings-group', self::GROUP_ID );
 
 		// define a section for the Admin - Settings panel
 		add_settings_section(static::PLUGIN_SECTION, 'Settings at www.grievancego.com', array($this, 'plugin_section_text'), static::PLUGIN_NAMESPACE);
 
 		// Register the automagic of Settings panels
+		add_settings_field('g_user_id', 'User ID: ', array($this, 'generate_input_field'), static::PLUGIN_NAMESPACE, static::PLUGIN_SECTION, array('field' => self::USER_ID));
+		add_settings_field('g_pass', 'Password: ', array($this, 'generate_input_field'), static::PLUGIN_NAMESPACE, static::PLUGIN_SECTION, array('field' => self::PASSWORD, 'type' => 'password'));
 		add_settings_field('g_group_id', 'Group ID: ', array($this, 'generate_input_field'), static::PLUGIN_NAMESPACE, static::PLUGIN_SECTION, array('field' => self::GROUP_ID));
 	}
 

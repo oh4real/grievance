@@ -9,7 +9,7 @@ User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KH
 */
 
 class Curl_Lib {
-	public static function get_web_page(Curl_Request $request, $cookiesIn = '' ){
+	public static function get(Curl_Request $request, $cookiesIn = '' ){
 	        $options = array(
 	            CURLOPT_RETURNTRANSFER => true,     // return web page
 	            CURLOPT_HEADER         => true,     //return headers in addition to content
@@ -51,7 +51,7 @@ class Curl_Lib {
 	        		->setCookies($cookiesOut);
 	}
 
-	public static function post_web_page(Curl_Request $request, array $postFields = array(), $cookiesIn = '') {
+	public static function post(Curl_Request $request, array $postFields = array(), $cookiesIn = '') {
 		$curlOpts = array(
 				CURLOPT_RETURNTRANSFER => true,     // return web page
 				CURLOPT_HEADER         => true,     //return headers in addition to content

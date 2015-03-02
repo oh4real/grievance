@@ -49,7 +49,8 @@ jQuery(document).ready(function($){
 		$.ajax({
 			url: ajaxurl,
 			data: {
-				'action':'grievance_ajax_request'
+				'action':'grievance_ajax_request',
+				'filter': typeof(filter) !== 'undefined' ? filter : ''
 			},
 			beforeSend:function() {
 				includeContent("<img src='/wp-content/plugins/grievance/media/images/ajax-loader.gif' class='grievance-loader'>");

@@ -23,10 +23,15 @@ class Grievance_Plugin {
 				exit ($response->setStatus(401));
 			}
 			// $resp = $gc->fetchSearchPage();file_put_contents('/tmp/response.xml', $resp);
-			$xmlString = $gc->extractHtmlTable($gc->fetchSearchResults());
+			if (array_key_exists('filter', $_GET) && $_GET['filter'] == 'all'){
+				$results = $gc->fetchAllSearchResults();
+			} else {
+				$results = $gc->fetchSearchResults();
+			}
+			$xmlString = $gc->extractHtmlTable($results);
 			$data = strlen($xmlString) ? $gc->convertTableToArray($xmlString) : exit ($response->setStatus(404));
 
-			exit ($response->setStatus(200)->setHtml($xmlString)->setData($data));
+			exit ($response->setStatus(200)->setData($data));
 		} else {
 			exit ($response->setStatus(400)->setData(array('user_id' => $wpUserId)));
 		}
@@ -54,8 +59,8 @@ class Grievance_Plugin {
 	}
 
 	private function getGrievanceOptions() {
-		$user_id = get_user_option(Grievance_Settings::USER_ID, $wpUserId);
-		$pass = get_user_option(Grievance_Settings::PASSWORD, $wpUserId);
+		$user_id = ($o = get_option(Grievance_Settings::USER_ID)) ? $o : get_user_option(Grievance_Settings::USER_ID, $wpUserId);
+		$pass = ($o = get_option(Grievance_Settings::PASSWORD)) ? $o : get_user_option(Grievance_Settings::PASSWORD, $wpUserId);
 		if (!$user_id || !$pass) {
 			return false;
 		}
