@@ -1,6 +1,6 @@
 <?php 
 
-require_once 'Simple_Plugin_Settings.php';
+require_once GRIEVANCE_ROOT . '/inc/Simple_Plugin_Settings.php';
 
 class Grievance_Settings extends Simple_Plugin_Settings {
 

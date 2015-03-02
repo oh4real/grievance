@@ -31,7 +31,7 @@ jQuery(document).ready(function($){
 				success:function(data) {
 					// This outputs the result of the ajax request
 					var dataObj = $.parseJSON(data);
-					if (dataObj.status === 404) {
+					if (dataObj.status === 400) {
 						$("#grievance_form").addClass('error');
 					} else {
 						includeContent('<h2>Settings Updated</h2>Refresh page to see your grievances.');
@@ -57,14 +57,16 @@ jQuery(document).ready(function($){
 			success:function(data) {
 				// This outputs the result of the ajax request
 				var dataObj = JSON.parse(data);
-				if (dataObj.status === 404) {
+				if (dataObj.status === 401) {
 					build_grievance_form();
-				} else if (dataObj.data !== null){
+				} else if (dataObj.status === 404){
+					includeContent("No Grievances found for you at grievancego.com.");
+				} else if (dataObj.data !== null) {
 					renderResults(dataObj.data);
 				} else if (dataObj.html !== null) {
 					includeContent(dataObj.html);
 				} else {
-					includeContent("No Grievances found for you at grievancego.com.");
+					includeContent("There was a problem. Please check with website administrator.");
 				}
 			},
 			error: function(errorThrown){

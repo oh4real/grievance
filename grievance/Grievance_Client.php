@@ -1,11 +1,12 @@
 <?php
-require_once('Curl_Lib.php');
+require_once(GRIEVANCE_ROOT . '/lib/Curl_Lib.php');
 
 class Grievance_Client {
 
-	const LOGON_PATH = 'https://www.grievancego.com/GrievanceWeb/LogonPath.do';
-	const FIND_PATH = 'https://www.grievancego.com/GrievanceWeb/GrievanceFindPath.do';
-	const GET_XLS_PATH = 'https://www.grievancego.com/GrievanceWeb/grievanceSearchExport.action';
+	const GRIEVANCE_HOST = 'www.grievancego.com';
+	const LOGON_PATH = '/GrievanceWeb/LogonPath.do';
+	const FIND_PATH = '/GrievanceWeb/GrievanceFindPath.do';
+	const GET_XLS_PATH = '/GrievanceWeb/grievanceSearchExport.action';
 
 	private $jsessionId;
 	private $userId;
@@ -14,8 +15,11 @@ class Grievance_Client {
 	private $firstName;
 	private $lastName;
 
+	private $curlRequest;
+
 	public function __construct() {
-		$this->jsessionId = Curl_Lib::get_web_page(self::LOGON_PATH)->getCookies();
+		$this->request = new Curl_Request(Curl_Request::HTTPS_PROTOCOL, self::GRIEVANCE_HOST);
+		$this->jsessionId = Curl_Lib::get_web_page($this->request->setRoute(self::LOGON_PATH))->getCookies();
 	}
 
 	public function login() {
@@ -24,22 +28,42 @@ class Grievance_Client {
 			"password" => $this->password,
 			"dispatch" => "logon"
 			);
-		Curl_Lib::post_web_page(self::LOGON_PATH . ";" . $this->jsessionId, $fields, $this->jsessionId);
-		return;
+		$request = clone $this->request;
+		$request->setRoute(self::LOGON_PATH . ";" . $this->jsessionId);
+		$response = Curl_Lib::post_web_page($request, $fields, $this->jsessionId);
+		$dom = new DOMDocument;
+		$dom->loadHTML($response->getContent());
+		$simpleXml = simplexml_load_string($dom->C14N());
+		$fieldNameElements = $simpleXml->xpath("//td[@class='messagetext']");
+		return !(bool)count($fieldNameElements);
+	}
+
+	public function fetchSearchPage() {
+		$request = clone $this->request;
+		$request->setRoute(self::FIND_PATH . '?dispatch=init')
+			->setReferer(sprintf('%s/%s', $request->getHost(), self::FIND_PATH ));
+		$content = Curl_Lib::get_web_page($request, $this->jsessionId)->getContent();
+		preg_match('/<form (.*)<\/form>/s', $content, $matches);
+		return str_replace('&nbsp;', '', preg_replace('/\s+/S', " ", $matches[0]));
 	}
 
 	public function fetchSearchResults() {
 		$findAllParams = array(
 		    "dispatch" => "find",
 		    "groupId" => $this->groupId,
+		    "sortOption" => "G",
 		    "employeeFullName" => sprintf("fname:%s lname:%s", $this->firstName, $this->lastName)
 		);
-
-		preg_match('/<form (.*)<\/form>/s', Curl_Lib::post_web_page(self::FIND_PATH, $findAllParams, $this->jsessionId)->getContent(), $matches);
+		$request = clone $this->request;
+		$request->setRoute(self::FIND_PATH)
+			->setReferer(sprintf('%s/%s', $request->getHost(), self::FIND_PATH . '?dispatch=init'));
+		$content = Curl_Lib::post_web_page($request, $findAllParams, $this->jsessionId)->getContent();
+		preg_match('/<form (.*)<\/form>/s', $content, $matches);
 		return str_replace('&nbsp;', '', preg_replace('/\s+/S', " ", $matches[0]));
 	}
 
 	public function extractHtmlTable($xml) {
+		// file_put_contents('/tmp/empty.html', $xml);
 		$dom = new DOMDocument;
 		$dom->loadHTML($xml);
 		$tables = $dom->getElementsByTagName('table');
@@ -58,15 +82,17 @@ class Grievance_Client {
 	}
 
 	public function convertTableToArray($xml) {
+		if (!strlen($xml)) {
+			return array();
+		}
 		$simpleXml = simplexml_load_string($xml);
-		$tables = $simpleXml->children()->children()->children();
-		$fieldNameElements = $tables->xpath("//tr[@bgcolor='lightblue']");
+		$fieldNameElements = $simpleXml->xpath("//tr[@bgcolor='lightblue']");
 		$keys = array();
 		foreach ($fieldNameElements[0]->children() as $th) {
 			$keys[] = preg_replace('/\W+/S', '', trim((string)$th));
 		}
 
-		$rows = $tables->xpath("//table[@class='results']/tbody/tr[not(@bgcolor)]");
+		$rows = $simpleXml->xpath("//table[@class='results']/tbody/tr[not(@bgcolor)]");
 		$json = array();
 		for ($i=1; $i<count($rows); $i += 3) {
 			$record = array();

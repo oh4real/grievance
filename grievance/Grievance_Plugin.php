@@ -3,9 +3,9 @@
 	@todo Make this one big class and adjust all the calls and add tests.
 */
 
-require_once 'Grievance_JsonView.php';
-require_once 'Grievance_Settings.php';
-require_once 'Grievance_Client.php';
+require_once GRIEVANCE_ROOT . '/Grievance/Grievance_JsonView.php';
+require_once GRIEVANCE_ROOT . '/Grievance/Grievance_Settings.php';
+require_once GRIEVANCE_ROOT . '/Grievance/Grievance_Client.php';
 
 class Grievance_Plugin {
 
@@ -19,13 +19,16 @@ class Grievance_Plugin {
 			$gc->setPassword($options[Grievance_Settings::PASSWORD]);
 			$gc->setGroupId(get_option(Grievance_Settings::GROUP_ID));
 			$gc->setWpUser(get_userdata($wpUserId));
-			$gc->login();
+			if (!$gc->login()) {
+				exit ($response->setStatus(401));
+			}
+			// $resp = $gc->fetchSearchPage();file_put_contents('/tmp/response.xml', $resp);
 			$xmlString = $gc->extractHtmlTable($gc->fetchSearchResults());
-			$data = $gc->convertTableToArray($xmlString);
+			$data = strlen($xmlString) ? $gc->convertTableToArray($xmlString) : exit ($response->setStatus(404));
 
 			exit ($response->setStatus(200)->setHtml($xmlString)->setData($data));
 		} else {
-			exit ($response->setStatus(404)->setData(array('user_id' => $wpUserId)));
+			exit ($response->setStatus(400)->setData(array('user_id' => $wpUserId)));
 		}
 		exit ($response->setStatus(500));
 	}

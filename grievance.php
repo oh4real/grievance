@@ -9,9 +9,10 @@
  * Network: false
  * License: GPL2
  */
+define('GRIEVANCE_ROOT', dirname(__FILE__));
 
-require_once('inc/Grievance_Settings.php');
-require_once('inc/Grievance_Plugin.php');
+require_once(GRIEVANCE_ROOT . '/Grievance/Grievance_Settings.php');
+require_once(GRIEVANCE_ROOT . '/Grievance/Grievance_Plugin.php');
 $gr = new Grievance_Plugin();
 $gs = new Grievance_Settings();
 
