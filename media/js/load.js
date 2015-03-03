@@ -1,6 +1,11 @@
 jQuery(document).ready(function($){
+	$('head').append($('<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.5/css/jquery.dataTables.css">'));
+	$('head').append($('<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.js"></script>'));
+	var grievance_content = function(html) {
+		$('#grievanceContent').html(html);
+	};
 	var build_grievance_form = function() {
-		includeContent(
+		grievance_content(
 			"<div id='grievance_form'>" +
 			"<div><label for='grievance_user_id'>Grievance Login</label><input id='grievance_user_id' /></div>" +
 			"<div><label for='grievance_password'>Grievance Password</label><input type='password' id='grievance_password' /></div>" +
@@ -8,11 +13,9 @@ jQuery(document).ready(function($){
 			"<button id='grievance_cancel_form'>Cancel</button>" +
 			"</div>"
 			);
-		$('#updateSettings').toggle();
 		$('#grievance_cancel_form').click(function() {
 			$('#grievance_form').remove();
-			$('#updateSettings').toggle();
-			get_grievance_table();
+			get_grievance_data();
 		});
 		$('#grievance_form_submit').click(function(){
 			$.ajax({
@@ -26,7 +29,7 @@ jQuery(document).ready(function($){
 					}
 				},
 				beforeSend:function() {
-					includeContent("<img src='/wp-content/plugins/grievance/media/images/ajax-loader.gif' class='grievance-loader'>");
+					grievance_content("<img src='/wp-content/plugins/grievance/media/images/ajax-loader.gif' class='grievance-loader'>");
 				},
 				success:function(data) {
 					// This outputs the result of the ajax request
@@ -34,18 +37,17 @@ jQuery(document).ready(function($){
 					if (dataObj.status === 400) {
 						$("#grievance_form").addClass('error');
 					} else {
-						includeContent('<h2>Settings Updated</h2>Refresh page to see your grievances.');
-						$('#updateSettings').toggle();
+						grievance_content('<h2>Settings Updated</h2>Refresh page to see your grievances.');
 					}
 				},
 				error: function(errorThrown){
-					includeContent("There was a problem. Please check with website administrator.");
+					grievance_content("There was a problem. Please check with website administrator.");
 					console.log(errorThrown);
 				}
 			});
 		});
 	};
-	var get_grievance_table = function() {
+	var get_grievance_data = function() {
 		$.ajax({
 			url: ajaxurl,
 			data: {
@@ -53,7 +55,7 @@ jQuery(document).ready(function($){
 				'filter': typeof(filter) !== 'undefined' ? filter : ''
 			},
 			beforeSend:function() {
-				includeContent("<img src='/wp-content/plugins/grievance/media/images/ajax-loader.gif' class='grievance-loader'>");
+				grievance_content("<img src='/wp-content/plugins/grievance/media/images/ajax-loader.gif' class='grievance-loader'>");
 			},
 			success:function(data) {
 				// This outputs the result of the ajax request
@@ -61,23 +63,20 @@ jQuery(document).ready(function($){
 				if (dataObj.status === 401) {
 					build_grievance_form();
 				} else if (dataObj.status === 404){
-					includeContent("No Grievances found for you at grievancego.com.");
+					grievance_content("No Grievances found for you at grievancego.com.");
 				} else if (dataObj.data !== null) {
-					renderResults(dataObj.data);
+					renderTable(dataObj.data);
 				} else if (dataObj.html !== null) {
-					includeContent(dataObj.html);
+					grievance_content(dataObj.html);
 				} else {
-					includeContent("There was a problem. Please check with website administrator.");
+					grievance_content("There was a problem. Please check with website administrator.");
 				}
 			},
 			error: function(errorThrown){
-				includeContent("There was a problem. Please check with website administrator.");
+				grievance_content("There was a problem. Please check with website administrator.");
 				console.log(errorThrown);
 			}
 		});
 	};
-	$('#updateSettings').click(function(){
-		build_grievance_form();
-	});
-	get_grievance_table();
+	get_grievance_data();
 });
