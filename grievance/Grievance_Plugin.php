@@ -33,7 +33,7 @@ class Grievance_Plugin {
 
 			exit ($response->setStatus(200)->setData($data));
 		} else {
-			exit ($response->setStatus(400)->setData(array('user_id' => $wpUserId)));
+			exit ($response->setStatus(401));
 		}
 		exit ($response->setStatus(500));
 	}
