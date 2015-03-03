@@ -1,4 +1,4 @@
-# grievance-go
+# grievance
 
 # Install Notes
 1. Upload the zipped plugin.
