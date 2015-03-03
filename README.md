@@ -1,7 +1,7 @@
 # grievance
 
 # Install Notes
-1. Upload the zipped plugin.
+1. Upload the zipped plugin. If pulled from github, remove "-master" from zip name.
 2. Activate the plugin for the website you want (or you can try Network Activate, but that's not tested).
 3. Go to Dashboard : Settings : Grievance and add a valid IGS# (log in directly to grievancego.com and ID is in top right corner).
 4. On the page you want this rendered, add minimum required content:
