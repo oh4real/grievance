@@ -3,9 +3,9 @@
 	@todo Make this one big class and adjust all the calls and add tests.
 */
 
-require_once GRIEVANCE_ROOT . '/Grievance/Grievance_JsonView.php';
-require_once GRIEVANCE_ROOT . '/Grievance/Grievance_Settings.php';
-require_once GRIEVANCE_ROOT . '/Grievance/Grievance_Client.php';
+require_once GRIEVANCE_ROOT . '/Main/Grievance_JsonView.php';
+require_once GRIEVANCE_ROOT . '/Main/Grievance_Settings.php';
+require_once GRIEVANCE_ROOT . '/Main/Grievance_Client.php';
 
 class Grievance_Plugin {
 
