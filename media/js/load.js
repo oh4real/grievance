@@ -4,6 +4,13 @@ jQuery(document).ready(function($){
 	var grievance_content = function(html) {
 		$('#grievanceContent').html(html);
 	};
+	var renderTable = function(data) {
+		jQuery('#grievanceTable').dataTable( {
+			data: data,
+			columns: typeof dataColumns !== 'undefined' ? dataColumns : []
+		});
+		jQuery('#grievanceContent').html('');
+	};
 	var build_grievance_form = function() {
 		grievance_content(
 			"<div id='grievance_form'>" +

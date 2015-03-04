@@ -9,25 +9,20 @@
 <div id="grievanceContent"></div>
 <table id="grievanceTable"></table>
 <script type="text/javascript">
-	var filter = 'all'; // remove or comment out if you want to limit users to see only their own greivances
-	var renderTable = function(data) {
-		jQuery('#grievanceTable').dataTable( {
-			data: data,
-			columns: [
-			// configure columns here
-				{ title: "Name", data: "EmployeeName" },
-				{ title: "Employee #", data: "Employee" },
-				{ title: "Domicile", data: "Domicile" },
-				{ title: "Grievance Rep", data: "GrievanceRep" },
-				{ title: "Date Filed", data: "DateFiled" },
-				{ title: "Status", data: "Status" },
-				{ title: "Occurence Date", data: "DateofOccurrence" },
-				{ title: "Dispute Type", data: "TypeofDispute" },
-				{ title: "Summary", data: "Summary" }
-			]
-		});
-		jQuery('#grievanceContent').html('');
-	};
+	// define filter with value 'all' to see all records, otherwise default of user only.
+	var filter = 'all'; 
+	// adjust columns as needed per https://datatables.net/reference/option/#Columns
+	var dataColumns = [
+		{ title: "Name", data: "EmployeeName" },
+		{ title: "Employee #", data: "Employee" },
+		{ title: "Domicile", data: "Domicile" },
+		{ title: "Grievance Rep", data: "GrievanceRep" },
+		{ title: "Date Filed", data: "DateFiled" },
+		{ title: "Status", data: "Status" },
+		{ title: "Occurence Date", data: "DateofOccurrence" },
+		{ title: "Dispute Type", data: "TypeofDispute" },
+		{ title: "Summary", data: "Summary" }
+	];
 </script>
 <script type="text/javascript" src="/wp-content/plugins/grievance/media/js/load.js"></script>
 ```
