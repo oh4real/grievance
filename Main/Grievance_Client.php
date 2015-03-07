@@ -63,22 +63,17 @@ class Grievance_Client {
 	}
 
 	public function fetchAllSearchResults() {
-		$uploadsDir = wp_upload_dir();
-		$filePath = $uploadsDir['path'] . '/grievance_cache.xml';
-		if (!is_file($filePath) || date('Y/m/d', filemtime($filePath)) != date('Y/m/d')) {
-			$findAllParams = array(
-			    "dispatch" => "find",
-			    "groupId" => $this->groupId,
-			    "sortOption" => "G"
-			);
-			$request = clone $this->request;
-			$request->setRoute(self::FIND_PATH)
-				->setReferer(sprintf('%s/%s', $request->getHost(), self::FIND_PATH . '?dispatch=init'));
-			$content = Curl_Lib::post($request, $findAllParams, $this->jsessionId)->getContent();
-			preg_match('/<form (.*)<\/form>/s', $content, $matches);
-			file_put_contents($filePath, str_replace('&nbsp;', '', preg_replace('/\s+/S', " ", $matches[0])));
-		}
-		return file_get_contents($filePath);
+		$findAllParams = array(
+		    "dispatch" => "find",
+		    "groupId" => $this->groupId,
+		    "sortOption" => "G"
+		);
+		$request = clone $this->request;
+		$request->setRoute(self::FIND_PATH)
+			->setReferer(sprintf('%s/%s', $request->getHost(), self::FIND_PATH . '?dispatch=init'));
+		$content = Curl_Lib::post($request, $findAllParams, $this->jsessionId)->getContent();
+		preg_match('/<form (.*)<\/form>/s', $content, $matches);
+		return str_replace('&nbsp;', '', preg_replace('/\s+/S', " ", $matches[0]));
 	}
 
 	public function extractHtmlTable($xml) {

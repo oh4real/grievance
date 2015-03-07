@@ -13,6 +13,7 @@ define('GRIEVANCE_ROOT', dirname(__FILE__));
 
 require_once(GRIEVANCE_ROOT . '/Main/Grievance_Settings.php');
 require_once(GRIEVANCE_ROOT . '/Main/Grievance_Plugin.php');
+
 $gp = new Grievance_Plugin();
 $gs = new Grievance_Settings();
 

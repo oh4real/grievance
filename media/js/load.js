@@ -1,6 +1,6 @@
 jQuery(document).ready(function($){
-	$('head').append($('<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.5/css/jquery.dataTables.css">'));
-	$('head').append($('<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.js"></script>'));
+	$('head').append($('<link rel="stylesheet" type="text/css" href="/wp-content/plugins/grievance/media/css/jquery.dataTables.1_10_5.css">'));
+	$('head').append($('<script type="text/javascript" charset="utf8" src="/wp-content/plugins/grievance/media/js/jquery.dataTables.1_10_5.js"></script>'));
 	var grievance_content = function(html) {
 		$('#grievanceContent').html(html);
 	};
