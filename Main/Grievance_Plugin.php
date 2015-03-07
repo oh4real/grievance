@@ -9,11 +9,26 @@ require_once GRIEVANCE_ROOT . '/Main/Grievance_Client.php';
 
 class Grievance_Plugin {
 
+	const CACHE_OBJECT_NAME = 'grievance_cache_%s';
+
 	public function plugin_ajax_request() {
-		error_reporting(E_PARSE);
 		$response = new Grievance_JsonView;
 		$wpUserId = get_current_user_id();
+		$searchAll = true;
+		error_reporting(E_PARSE);
+
+		if (array_key_exists('filter', $_GET) && $_GET['filter'] == 'all') {
+			$cacheKey = sprintf(self::CACHE_OBJECT_NAME, 'all');
+		} else {
+			$cacheKey = sprintf(self::CACHE_OBJECT_NAME, $wpUserId);
+			$searchAll = false;
+		}
+		
 		if ($options = $this->getGrievanceOptions()) {
+			if ($data = get_transient($cacheKey)) {
+				exit ($response->setStatus(200)->setData($data));
+			}
+
 			$gc = new Grievance_Client();
 			$gc->setUserId($options[Grievance_Settings::USER_ID]);
 			$gc->setPassword($options[Grievance_Settings::PASSWORD]);
@@ -23,14 +38,15 @@ class Grievance_Plugin {
 				exit ($response->setStatus(401));
 			}
 			// $resp = $gc->fetchSearchPage();file_put_contents('/tmp/response.xml', $resp);
-			if (array_key_exists('filter', $_GET) && $_GET['filter'] == 'all'){
+			if ($searchAll) {
 				$results = $gc->fetchAllSearchResults();
 			} else {
 				$results = $gc->fetchSearchResults();
 			}
 			$xmlString = $gc->extractHtmlTable($results);
 			$data = strlen($xmlString) ? $gc->convertTableToArray($xmlString) : exit ($response->setStatus(404));
-
+			set_transient($cacheKey, $data, 1 * DAY_IN_SECONDS);
+			
 			exit ($response->setStatus(200)->setData($data));
 		} else {
 			exit ($response->setStatus(401));
