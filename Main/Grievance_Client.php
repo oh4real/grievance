@@ -51,7 +51,7 @@ class Grievance_Client {
 		$findAllParams = array(
 		    "dispatch" => "find",
 		    "groupId" => $this->groupId,
-		    "sortOption" => "G",
+		    "sortOption" => "F",
 		    "employeeFullName" => sprintf("fname:%s lname:%s", $this->firstName, $this->lastName)
 		);
 		$request = clone $this->request;
@@ -114,6 +114,9 @@ class Grievance_Client {
 			foreach($data as $key => $val) {
 				if ($val->count()) {
 					// @todo: do some iterations
+					if (isset($val->a) && ((string) $val->a)) {
+						$record[$key] = (string) $val->a;
+					}
 				} else {
 					$record[$key] = (string) $val;
 				}

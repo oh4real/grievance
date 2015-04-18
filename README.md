@@ -13,6 +13,7 @@
 	var filter = 'all'; 
 	// adjust columns as needed per https://datatables.net/reference/option/#Columns
 	var dataColumns = [
+		{ title: "Grievance Number", data: "GrievNbr"},
 		{ title: "Name", data: "EmployeeName" },
 		{ title: "Employee #", data: "Employee" },
 		{ title: "Domicile", data: "Domicile" },
@@ -25,4 +26,15 @@
 	];
 </script>
 <script type="text/javascript" src="/wp-content/plugins/grievance/media/js/load.js"></script>
+```
+
+# Testing
+1. Execute the test.php from command line with 3 arguments: username password ID
+```
+php test.php UserName PassWord IGS####
+```
+2. The test.php will write the JSON output to /tmp/response.json
+3. If the script is short and no output, then there might be an error, but Grievance_Client::plugin_ajax_request() blocks errors (too verbose from HTML parsing). Comment out the line:
+```
+error_reporting(E_PARSE);
 ```

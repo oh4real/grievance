@@ -26,6 +26,7 @@ class Grievance_Plugin {
 		
 		if ($options = $this->getGrievanceOptions()) {
 			if ($data = get_transient($cacheKey)) {
+				// *** Comment next line to stop caching.
 				exit ($response->setStatus(200)->setData($data));
 			}
 
